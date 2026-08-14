@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <title>Video Analytics</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+        h1 {
+            color: #333;
+        }
+
+        table{
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td{
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th{
+            background: #f5f5f5;
+        }
+
+    </style>
+</head>
+<body>
+    <h1>สถิติวิดีโอ</h1>
+    <p>ทดสอบหน้าแรก</p>
+
+    <table>
+        <tr>
+            <th>ชื่อคลิป</th>
+            <th>วิว</th>
+            <th>ไลก์</th>
+        </tr>
+        <tbody id="video-list"></tbody>
+    </table>
+    <script>
+        async function loadVideos(){
+            const response = await fetch("http://127.0.0.1:8000/videos");
+            const data = await response.json();
+            const tbody = document.getElementById("video-list");
+
+            for (const v of data.videos){
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${v.title}</td>
+                        <td>${v.views}</td>
+                        <td>${v.likes}</td>
+                    </tr>
+                `;
+            }
+        }
+        loadVideos();
+    </script>
+</body>
+</html>
