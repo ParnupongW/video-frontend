@@ -54,6 +54,7 @@
             <th>ชื่อคลิป</th>
             <th>วิว</th>
             <th>ไลก์</th>
+            <th>ลบ</th>
         </tr>
         <tbody id="video-list"></tbody>
     </table>
@@ -71,6 +72,7 @@
                         <td>${v.title}</td>
                         <td>${v.views}</td>
                         <td>${v.likes}</td>
+                        <td><button type="button" onclick="deleteVideo(${v.id})">ลบ</button></td> 
                     </tr>
                 `;
             }
@@ -100,9 +102,23 @@
             }
         }
 
-        let token = "";
+        async function deleteVideo(id){
 
+            const response = await fetch(`http://127.0.0.1:8000/videos/${id}`, {
+                method: "DELETE",
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                },
+            });
+            console.log(response.status);
+
+            if(response.status === 200){
+                loadVideos();
+            }
+        }
+        let token = "";
         async function login(){
+            
             const username = document.getElementById("username").value;
             const password = document.getElementById("password").value;
 
@@ -121,6 +137,7 @@
             if(response.status === 200) {
                 const data = await response.json();
                 token = data.access_token;
+                localStorage.setItem("token", token);
                 status.textContent = "เข้าสู่ระบบแล้ว";
             }
             else{
