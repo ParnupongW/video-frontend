@@ -34,6 +34,20 @@
 <body>
     <h1>สถิติวิดีโอ</h1>
     <p>ทดสอบหน้าแรก</p>
+    <h2>เข้าสู่ระบบ</h2>
+    <div>
+        <input type="text" id="username" placeholder="username">
+        <input type="password" id="password" placeholder="password">
+        <button type="button" onclick="login()">เข้าสู่ระบบ</button>
+        <span id="login-status"></span>
+    </div>
+    <h2>เพิ่มวิดีโอ</h2>
+    <div>
+        <input type="text" id="title" placeholder="ชื่อคลิป">
+        <input type="number" id="views" placeholder="วิว">
+        <input type="number" id="likes" placeholder="ไลก์">
+        <button onclick="addVideo()">เพิ่ม</button>
+    </div>
 
     <table>
         <tr>
@@ -47,7 +61,9 @@
         async function loadVideos(){
             const response = await fetch("http://127.0.0.1:8000/videos");
             const data = await response.json();
+
             const tbody = document.getElementById("video-list");
+            tbody.innerHTML ="";
 
             for (const v of data.videos){
                 tbody.innerHTML += `
@@ -59,7 +75,61 @@
                 `;
             }
         }
+
+        async function addVideo(){
+            const title = document.getElementById("title").value;
+            const views = document.getElementById("views").value;
+            const likes = document.getElementById("likes").value;
+
+            const response = await fetch("http://127.0.0.1:8000/videos", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    title: title,
+                    views: Number(views),
+                    likes: Number(likes)
+                })
+            });
+            console.log(response.status);
+
+            if(response.status === 201){
+                loadVideos();
+            }
+        }
+
+        let token = "";
+
+        async function login(){
+            const username = document.getElementById("username").value;
+            const password = document.getElementById("password").value;
+
+            const formData = new URLSearchParams();
+            formData.append("username", username);
+            formData.append("password", password);
+
+            const response = await fetch("http://127.0.0.1:8000/login",{
+                method: "POST",
+                headers: { "Content-Type": "application/x-www-form-urlencoded"},
+                body: formData
+            });
+
+            const status = document.getElementById("login-status");
+
+            if(response.status === 200) {
+                const data = await response.json();
+                token = data.access_token;
+                status.textContent = "เข้าสู่ระบบแล้ว";
+            }
+            else{
+                status.textContent = "username หรือ password ไม่ถูกต้อง";
+            }
+        }
+
         loadVideos();
+
     </script>
 </body>
 </html>
